@@ -5,7 +5,7 @@
             "label": "build",
             "command": "make",
             "options": {
-                "cwd": "${workspaceFolder}"
+                "cwd": "${workspaceFolder}/"//might need to add slash here
             },
             "problemMatcher": [
                 "$gcc"
