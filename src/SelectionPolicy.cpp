@@ -6,7 +6,7 @@
 //---------------------------NAIVESELECTION---------------------------------------------
 NaiveSelection::NaiveSelection(){
     lastSelectedIndex=0;
-};
+}
 
 
 const FacilityType& NaiveSelection::selectFacility(const vector<FacilityType>& facilitiesOptions) {
@@ -24,7 +24,7 @@ const FacilityType& NaiveSelection::selectFacility(const vector<FacilityType>& f
 
 // Method to return the string representation of NaiveSelection
 const string NaiveSelection::toString() const {
-    return "NaiveSelection lastselectedindex="+this->lastSelectedIndex;  // A simple string for demonstration, can be expanded
+    return "NaiveSelection lastselectedindex="+ std::to_string(this->lastSelectedIndex);  // A simple string for demonstration, can be expanded
 }
 
 // Method to clone the NaiveSelection object
@@ -75,12 +75,12 @@ const FacilityType& BalancedSelection::selectFacility(const vector<FacilityType>
 
 // Method to return the string representation of NaiveSelection
 const string BalancedSelection::toString() const {
-    return "NaiveSelection obj lifequality: "+this->LifeQualityScore +"  enviro score: "+ this->EnvironmentScore+" economyscore "+this->EconomyScore;  // A simple string for demonstration, can be expanded
+    return "NaiveSelection obj lifequality: "+ std::to_string(this->LifeQualityScore ) +" enviro score: "+ std::to_string( this->EnvironmentScore)+" economyscore "+std::to_string(this->EconomyScore);  // A simple string for demonstration, can be expanded
 }
 
 // Method to clone the NaiveSelection object
 BalancedSelection* BalancedSelection::clone() const {
-    return new BalancedSelection(*this);  // Return a new instance with the same state
+    return new BalancedSelection(*this);  // Return a new instance with the same state // default copy contructor 
 }
 
 BalancedSelection::~BalancedSelection(){}//no dynamic memory to release
@@ -90,6 +90,7 @@ EconomySelection::EconomySelection(){
     lastSelectedIndex =0;
 }
 
+/*
 const FacilityType& EconomySelection::selectFacility(const vector<FacilityType>& facilitiesOptions)
 {
     int temp;
@@ -107,6 +108,7 @@ const FacilityType& EconomySelection::selectFacility(const vector<FacilityType>&
         {lastSelectedIndex=0;}
     }
 }
+*/
 
 
 const FacilityType& EconomySelection::selectFacility(const vector<FacilityType>& facilitiesOptions)
@@ -141,3 +143,67 @@ const FacilityType& EconomySelection::selectFacility(const vector<FacilityType>&
         lastSelectedIndex = (lastSelectedIndex + 1) % facilitiesOptions.size();
     }
 }
+
+const string EconomySelection::toString() const{
+    return "current economy selection index is" + std::to_string(this->lastSelectedIndex); 
+}
+
+// Method to clone the EconomySelection object
+EconomySelection* EconomySelection::clone() const {
+    return new EconomySelection(*this);  // Return a new instance with the same state // default copy contructor 
+}
+
+EconomySelection::~EconomySelection(){} //no memory to release
+
+
+//------------------------SUSTAINABILITYSELECTION---------------------
+SustainabilitySelection::SustainabilitySelection(){
+    lastSelectedIndex =0;
+}
+
+
+const FacilityType& SustainabilitySelection::selectFacility(const vector<FacilityType>& facilitiesOptions)
+{
+    // Check if there is any ENVIRONMENT facility in the list
+    bool sustainabiltyFound = false;
+    for (const auto& facility : facilitiesOptions) {
+        if (facility.getCategory() == FacilityCategory::ENVIRONMENT) {
+            sustainabiltyFound = true;
+            break;
+        }
+    }
+
+    // If no ENVIRONMENT facility exists, throw an error
+    if (!sustainabiltyFound) {
+        throw std::runtime_error("No ENVIRONMENT facility found.");
+    }
+
+    // Proceed with the main loop to select ENVIRONMENT facilities
+    while (true) {
+        if (facilitiesOptions[lastSelectedIndex].getCategory() == FacilityCategory::ENVIRONMENT) {
+            // Return the facility of type ENVIRONMENT
+            const FacilityType& selectedFacility = facilitiesOptions[lastSelectedIndex];
+
+            // Move to the next facility in the list (loop back to the beginning if needed)
+            lastSelectedIndex = (lastSelectedIndex + 1) % facilitiesOptions.size();
+
+            return selectedFacility;
+        }
+
+        // If the current facility is not ENVIRONMENT, just move to the next one
+        lastSelectedIndex = (lastSelectedIndex + 1) % facilitiesOptions.size();
+    }
+}
+
+const string SustainabilitySelection::toString() const{
+    return "current sustainability selection index is" + std::to_string(this->lastSelectedIndex); 
+}
+
+// Method to clone the SustainabilitySelection object
+SustainabilitySelection* SustainabilitySelection::clone() const {
+    return new SustainabilitySelection(*this);  // Return a new instance with the same state // default copy contructor 
+}
+
+SustainabilitySelection::~SustainabilitySelection(){} //no memory to release
+
+
