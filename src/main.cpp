@@ -4,7 +4,6 @@
 using namespace std;
 
 Simulation* backup = nullptr;
-
 int main(int argc, char** argv){
     cout<<"kishkashta"<<std::endl;
     /*
