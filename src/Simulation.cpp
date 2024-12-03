@@ -34,7 +34,7 @@ Simulation::Simulation(const string &configFilePath)
             // Create a Settlement
             std::string settlementName = arguments[1];
             int settlementType = std::stoi(arguments[2]); // Convert string to int
-            settlements.emplace_back(settlementName, settlementType); // Constructed directly in place with enum paassed
+            settlements.emplace_back(settlementName, static_cast<SettlementType>(settlementType)); // Constructed directly in place with enum paassed
         }
         else if (arguments[0] == "facility" && arguments.size() == 7) {
             // Create a Facility
@@ -52,33 +52,10 @@ Simulation::Simulation(const string &configFilePath)
             std::string settlementName = arguments[1];
             std::string policyType = arguments[2];
 
-            SelectionPolicy *policy = nullptr;
-             if (policyType == "nve") {
-                policy = new NaiveSelection();}
-            else if (policyType == "eco") {
-                policy = new EconomySelection();
-            }else if (policyType == "env") {
-                policy = new SustainabilitySelection();
-            } else if (policyType == "bal") {
-                policy = new BalancedSelection(0,0,0);
-            } else {
-                throw std::runtime_error("Error: Unknown selection policy type: " + policyType);
-            }
+            SelectionPolicy *policy = getSelectionPolicy(policyType);
+        
 
-            Settlement &settlement = getSettlement(settlementName); // Find the settlement by name
-            /*
-            
-            here we need to find out what is the correct way to set policy of plan that exists 
-            if no such plan - print error
-            if the plan exists you should use setselectiopolicy() in plan.cpp
-
-            last discovered - in the config file the settlements and plans are to concrete build those 
-            and facilities you concrete build too but they act as models which you clone to put into a facility/plan
-             */
-
-
-
-            plans.emplace_back(settlement, policy);
+            plans.emplace_back(getSettlement(settlementName), policy);//no error checking here
             ++planCounter; // Increment the plan counter
         }
         else {
@@ -93,11 +70,13 @@ void Simulation::start (){
     open();
     std::cout << "simulation start" << std::endl;
     std::string input;
-    //std::cout << "Enter your command ";
     BaseAction* action = nullptr;
-    std::cin >> input;
-    while(input!="close")
+    
+    int toclose = false;
+    while(!toclose)
     {
+        std::cout << "Enter your command ";
+        std::cin >> input;
         if (action != nullptr) {
             delete action; // Free memory
         }
@@ -123,27 +102,52 @@ void Simulation::start (){
         {
             action = new PrintPlanStatus(std::stoi(arguments[1]));
         }
-        else if ()//CONTINUE HERE WITH CHANGE PLANPOLICY
-
-
+        else if (arguments[0] == "  changePolicy")//CONTINUE HERE WITH CHANGE PLANPOLICY
+        {
+            action = new ChangePlanPolicy(std::stoi(arguments[1]),arguments[2]);
+        }
+        else if(arguments[0]=="log")
+        {
+            action = new PrintActionsLog();
+        }
+        else if(arguments[0]=="backup")
+        {
+            action = new BackupSimulation();
+        }
+         else if(arguments[0]=="restore")
+        {
+            action = new RestoreSimulation();
+        }
+        else if(arguments[0]=="close")
+        {
+             action = new Close();
+             toclose = true;
+        }
 
         if (action != nullptr) {
             action->act(*this); // Execute the action
+            if(action->getStatus() == ActionStatus::COMPLETED)
+            {
+                std::cout << "command completed successfully";
+            }
+            else
+            {
+                std::cout << "command failed here is the message: "+action->realerrormessage();
+            }
         }
-        //std::cout << "Enter your command ";
-        std::cin >> input;
+    
     }
-
       // At the end, delete the last allocated action (if any)
     if (action != nullptr) {
         delete action;}
-    close();
 }
+
+
 
 void Simulation::addPlan(const Settlement &settlement, SelectionPolicy *selectionPolicy){
     Plan newplan(planCounter,settlement,selectionPolicy,facilitiesOptions);
+    plans.push_back(newplan);
     ++planCounter;
-
 }
 
 void Simulation::addAction(BaseAction *action){
@@ -164,6 +168,23 @@ bool Simulation::isSettlementExists(const string &settlementName){
         
 Settlement& Simulation::getSettlement(const string &settlementName){
 
+}
+
+SelectionPolicy* Simulation::getSelectionPolicy(const string &selectionpolicystringo)
+{
+    SelectionPolicy* policy = nullptr;
+             if (selectionpolicystringo == "nve") {
+                policy = new NaiveSelection();}
+            else if (selectionpolicystringo == "eco") {
+                policy = new EconomySelection();
+            }else if (selectionpolicystringo == "env") {
+                policy = new SustainabilitySelection();
+            } else if (selectionpolicystringo == "bal") {
+                policy = new BalancedSelection(0,0,0);
+            } else {
+                throw std::runtime_error("Error: Unknown selection policy type: " + selectionpolicystringo);
+            }
+        return policy;
 }
         
 Plan & Simulation::getPlan(const int planID){
