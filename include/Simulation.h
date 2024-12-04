@@ -19,8 +19,11 @@ class Simulation {
         bool addSettlement(Settlement *settlement);
         bool addFacility(FacilityType facility);
         bool isSettlementExists(const string &settlementName);
+        bool isFacilityexists(const string &facilityname);
+        bool isplanexists(int planID);
+        vector<BaseAction*>& getactionsLog();
+
         Settlement &getSettlement(const string &settlementName);
-        SelectionPolicy *getSelectionPolicy(const string &selectionpolicystringo);//we added
 
         Plan &getPlan(const int planID);
         void step();

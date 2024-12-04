@@ -52,7 +52,19 @@ Simulation::Simulation(const string &configFilePath)
             std::string settlementName = arguments[1];
             std::string policyType = arguments[2];
 
-            SelectionPolicy *policy = getSelectionPolicy(policyType);
+
+            SelectionPolicy* policy = nullptr;
+             if (policyType == "nve") {
+                policy = new NaiveSelection();}
+            else if (policyType == "eco") {
+                policy = new EconomySelection();
+            }else if (policyType == "env") {
+                policy = new SustainabilitySelection();
+            } else if (policyType == "bal") {
+                policy = new BalancedSelection(0,0,0);
+            } else {
+                throw std::runtime_error("Error: Unknown selection policy type: " + policyType);
+            }
         
 
             plans.emplace_back(getSettlement(settlementName), policy);//no error checking here
@@ -72,11 +84,11 @@ void Simulation::start (){
     std::string input;
     BaseAction* action = nullptr;
     
-    int toclose = false;
-    while(!toclose)
+    while(isRunning)
     {
         std::cout << "Enter your command ";
         std::cin >> input;
+        
         if (action != nullptr) {
             delete action; // Free memory
         }
@@ -120,8 +132,7 @@ void Simulation::start (){
         }
         else if(arguments[0]=="close")
         {
-             action = new Close();
-             toclose = true;
+             action = new Close();//this calls close in actioin which calls close in this class which sets isrunning to false
         }
 
         if (action != nullptr) {
@@ -134,6 +145,9 @@ void Simulation::start (){
             {
                 std::cout << "command failed here is the message: "+action->realerrormessage();
             }
+
+            actionsLog.push_back(action->clone());//create a copy because the action is deleted after another way would simply be not to copy and not to delete
+
         }
     
     }
@@ -155,14 +169,21 @@ void Simulation::addAction(BaseAction *action){
 }
         
 bool Simulation::addSettlement(Settlement *settlement){
-
+    settlements.push_back(settlement);
+    return true;
 }
         
 bool Simulation::addFacility(FacilityType facility){
-
+    facilitiesOptions.push_back(facility);
+    return true;
 }
 
 bool Simulation::isSettlementExists(const string &settlementName){
+
+}
+
+bool Simulation::isFacilityexists(const string &facilityname)
+{
 
 }
         
@@ -170,21 +191,9 @@ Settlement& Simulation::getSettlement(const string &settlementName){
 
 }
 
-SelectionPolicy* Simulation::getSelectionPolicy(const string &selectionpolicystringo)
+bool Simulation::isplanexists(const int planID )
 {
-    SelectionPolicy* policy = nullptr;
-             if (selectionpolicystringo == "nve") {
-                policy = new NaiveSelection();}
-            else if (selectionpolicystringo == "eco") {
-                policy = new EconomySelection();
-            }else if (selectionpolicystringo == "env") {
-                policy = new SustainabilitySelection();
-            } else if (selectionpolicystringo == "bal") {
-                policy = new BalancedSelection(0,0,0);
-            } else {
-                throw std::runtime_error("Error: Unknown selection policy type: " + selectionpolicystringo);
-            }
-        return policy;
+
 }
         
 Plan & Simulation::getPlan(const int planID){
@@ -208,4 +217,9 @@ void Simulation::close()
 void Simulation::open()
 {
     isRunning = true;
+}
+
+vector<BaseAction*>& Simulation::getactionsLog()
+{
+    return actionsLog;
 }

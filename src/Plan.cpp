@@ -1,6 +1,8 @@
 #include "Plan.h"
 #include <iostream>
 #include <string>
+#include <sstream> // For std::ostringstream
+#include <vector>
 
 using std::cout;
 using std::endl;
@@ -57,4 +59,32 @@ void Plan::addFacility(Facility* facility) {
 const string Plan::toString() const {
     return "Plan ID: " + std::to_string(plan_id) +
            ", Status: " + ((status == PlanStatus::AVALIABLE) ? "AVAILABLE" : "BUSY");
+}
+
+
+const string Plan::toString() const {
+    std::ostringstream oss;
+
+    oss << "Plan ID: " << plan_id << "\n";
+    oss << "Settlement: " << settlement.toString() << "\n"; 
+    oss << "Selection Policy: " << (selectionPolicy ? selectionPolicy->toString() : "None") << "\n"; 
+    oss << "Facilities\n";
+
+ oss << "Status: " << (status == PlanStatus::AVALIABLE ? "Available" : "Unavailable") << "\n";
+    oss << "Scores - Life Quality: " << life_quality_score
+        << ", Economy: " << economy_score
+        << ", Environment: " << environment_score << "\n";
+
+    for (const auto *facility  : underConstruction) {
+        oss << "  - " << facility->toString() << "\n";
+        
+    }
+
+    for (const auto *facility  : facilities) {
+        oss << "  - " << facility->toString() << "\n"; 
+    }
+
+   
+
+    return oss.str();
 }
