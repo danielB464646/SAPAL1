@@ -135,7 +135,8 @@ void Simulation::start (){
              action = new Close();//this calls close in actioin which calls close in this class which sets isrunning to false
         }
 
-        if (action != nullptr) {
+        if (action != nullptr) 
+        {
             action->act(*this); // Execute the action
             if(action->getStatus() == ActionStatus::COMPLETED)
             {
@@ -145,10 +146,12 @@ void Simulation::start (){
             {
                 std::cout << "command failed here is the message: "+action->realerrormessage();
             }
-
-            actionsLog.push_back(action->clone());//create a copy because the action is deleted after another way would simply be not to copy and not to delete
-
+            action->setusercommand(input);
+            addAction(action);//add action to list of actions even if it failed
         }
+        else{
+                std::cout << "bad command";
+            }
     
     }
       // At the end, delete the last allocated action (if any)
@@ -165,6 +168,7 @@ void Simulation::addPlan(const Settlement &settlement, SelectionPolicy *selectio
 }
 
 void Simulation::addAction(BaseAction *action){
+        actionsLog.push_back(action->clone());//create a copy because the action is deleted after another way would simply be not to copy and not to delete
 
 }
         
@@ -179,37 +183,61 @@ bool Simulation::addFacility(FacilityType facility){
 }
 
 bool Simulation::isSettlementExists(const string &settlementName){
-
+    bool found = false;
+    for(Settlement* set:settlements)
+    {
+        if (set->getName()==settlementName)
+        {found =true;}
+    }
+    return found;
 }
 
 bool Simulation::isFacilityexists(const string &facilityname)
 {
-
+    bool found = false;
+    for(FacilityType& fac:facilitiesOptions)
+    {
+        if (fac.getName()==facilityname)
+        {found =true;}
+    }
+    return found;
 }
         
 Settlement& Simulation::getSettlement(const string &settlementName){
+    for(Settlement* set:settlements)
+    {
+        if (set->getName()==settlementName)
+        {return *set;}
+    }
 
 }
 
 bool Simulation::isplanexists(const int planID )
 {
-
+    if(planID>=0&&planID<planCounter)
+    {return true;}
+    else
+    return false;
 }
         
 Plan & Simulation::getPlan(const int planID){
+    return plans[planID];
 
 }
 
 void Simulation::step()
     {
-        //create action of type simulate step Simialstepact
-        //call Simialstepact->act(this)
+   
         //this action never results in an error
+        for (Plan& p:plans)
+        {
+            p.step();
+        }
 
     }
 void Simulation::close()
     {
-        //print all plans with their scores
+        //in action the close->act already printed all the plans
         isRunning = false;
 
 }

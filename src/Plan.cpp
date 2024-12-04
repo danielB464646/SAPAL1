@@ -15,7 +15,6 @@ Plan::Plan(const int planId, const Settlement &settlement, SelectionPolicy *sele
     // Constructor body
 }
 
-// Getters
 const int Plan::getlifeQualityScore() const {
     return life_quality_score;
 }
@@ -55,12 +54,6 @@ void Plan::addFacility(Facility* facility) {
     facilities.push_back(facility);
 }
 
-// Convert the plan to a string representation
-const string Plan::toString() const {
-    return "Plan ID: " + std::to_string(plan_id) +
-           ", Status: " + ((status == PlanStatus::AVALIABLE) ? "AVAILABLE" : "BUSY");
-}
-
 
 const string Plan::toString() const {
     std::ostringstream oss;
@@ -77,7 +70,7 @@ const string Plan::toString() const {
 
     for (const auto *facility  : underConstruction) {
         oss << "  - " << facility->toString() << "\n";
-        
+
     }
 
     for (const auto *facility  : facilities) {
