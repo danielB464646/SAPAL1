@@ -2,7 +2,7 @@
 #include <string>
 #include <vector>
 #include "Simulation.h"
-extern Simulation* backup = nullptr;
+extern Simulation* backup;
 enum class SettlementType;
 enum class FacilityCategory;
 
@@ -14,8 +14,8 @@ class BaseAction{
     public:
         BaseAction();
         ActionStatus getStatus() const;
-        std::string  BaseAction::actionStatusToString() const;
-        const string &realerrormessage() const; //tjis is cos we need to access error message from other classes
+        std::string actionStatusToString() const; 
+        const string &realerrormessage() const; //this is cos we need to access error message from other classes
         virtual void act(Simulation& simulation)=0;
         virtual const string toString() const=0;
         virtual BaseAction* clone() const = 0;

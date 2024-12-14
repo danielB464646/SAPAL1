@@ -5,12 +5,14 @@
 #include <iostream>
 #include <unordered_set>
 #include <string>
+#include <sstream>
 using std::ostringstream;
 
 using std::cout;
 using std::endl;
 
-#include <sstream>
+Simulation* backup = nullptr;
+
 // Constructor
 BaseAction::BaseAction() : status(ActionStatus::COMPLETED), errorMsg("") {
     // Default constructor body
@@ -59,10 +61,10 @@ const string &BaseAction::realerrormessage() const {
 }
 
 
-// Virtual destructor (optional to define explicitly, defaulted in header)
-BaseAction::~BaseAction() {
-    // Cleanup, if needed
-}
+// // Virtual destructor (optional to define explicitly, defaulted in header)
+// BaseAction::~BaseAction() {
+//     // Cleanup, if needed
+// }
 
 
 
@@ -142,7 +144,7 @@ void AddFacility::act(Simulation &simulation)
 }
 
 
-const const std::string AddFacility::toString() const
+const std::string AddFacility::toString() const
 {
     //we can move this 
     string cat;
@@ -194,24 +196,23 @@ void AddSettlement::act(Simulation &simulation)
     }
 }
 
-const const std::string AddSettlement::toString() const
-{
-string typeStr;
-    switch (settlementType)
-    {
-    case SettlementType::VILLAGE:
-        typeStr = "Village";
-        break;
-    case SettlementType::CITY:
-        typeStr = "City";
-        break;
-    case SettlementType::METROPOLIS:
-        typeStr = "Metropolis";
-        break;
+const string AddSettlement::toString() const {
+    string typeStr; // No std:: qualifier
+    switch (settlementType) {
+        case SettlementType::VILLAGE:
+            typeStr = "Village";
+            break;
+        case SettlementType::CITY:
+            typeStr = "City";
+            break;
+        case SettlementType::METROPOLIS:
+            typeStr = "Metropolis";
+            break;
     }
 
-    return (settlementName + " "+typeStr +"|" + actionStatusToString());
+    return (settlementName + " " + typeStr + "|" + actionStatusToString());
 }
+
 
 AddSettlement* AddSettlement::clone () const{
     return new  AddSettlement(*this);
@@ -238,7 +239,7 @@ void PrintPlanStatus::act(Simulation &simulation)
 }
 
 
-const const std::string PrintPlanStatus::toString() const
+const std::string PrintPlanStatus::toString() const
 {
     return (planId + "|" + actionStatusToString());
 }
@@ -309,7 +310,9 @@ const void BaseAction::setusercommand(string & usertyped){
 }
 
 const std::string BaseAction::toString() const
-{}
+{
+    return "Empty String";
+}
 
 
 
@@ -331,7 +334,9 @@ void Close::act(Simulation &simulation)
     complete();
 }
 
-const string Close::toString() const{}
+const string Close::toString() const{
+    return "Empty String";
+}
 
 Close* Close::clone () const{
     return new  Close(*this);
@@ -349,7 +354,7 @@ void BackupSimulation::act(Simulation &simulation)
 }
 
 const string BackupSimulation::toString() const{
-
+    return "Empty String";
 }
 
 
@@ -378,7 +383,7 @@ RestoreSimulation* RestoreSimulation::clone () const{
 }
 
 const string RestoreSimulation::toString() const{
-
+    return "Empty String";
 }
 
 //-------------------STEP-------------------
@@ -399,8 +404,13 @@ SimulateStep* SimulateStep::clone () const{
 }
 
 const string SimulateStep::toString() const{
-    
+    return "Empty String";
 }
+
+const std::string PrintActionsLog::toString() const {
+    return "PrintActionsLog Action"; // Provide a meaningful string if needed
+}
+
 
 //----------------------
 

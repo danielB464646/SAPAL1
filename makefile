@@ -1,17 +1,26 @@
-# Please implement your Makefile rules and targets below.
-# Customize this file to define how to build your project.
-
-# Compiler flags
+# Compiler and flags
+CXX = g++
 CXXFLAGS = -g -O0 -Iinclude
 
-all: clean compile run
+# Target executable
+TARGET = main
 
-compile:
-	g++ -g -O0 -Iinclude -o main src/main.cpp src/Simulation.cpp
-	g++ $(CXXFLAGS) -o main src/main.cpp
+# Automatically find all .cpp and .h files in the src directory
+SRC = $(wildcard src/*.cpp)
+HEADERS = $(wildcard src/*.h)
+OBJ = $(SRC:.cpp=.o)
 
-run:
-	./main
+# Default target
+all: $(TARGET)
 
+# Link the object files into an executable
+$(TARGET): $(OBJ)
+	$(CXX) $(CXXFLAGS) -o $@ $^
+
+# Compile each .cpp file into an object file
+%.o: %.cpp $(HEADERS)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+# Clean up build artifacts
 clean:
-	rm -f main
+	rm -f $(OBJ) $(TARGET)

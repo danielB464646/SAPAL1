@@ -5,11 +5,8 @@
 #include <iostream>
 #include "Action.h"
 
-
-// Constructor
 Simulation::Simulation(const string &configFilePath)
-    : isRunning(false), planCounter(0), actionsLog(), plans(), settlements(), facilitiesOptions()
-{
+    : isRunning(false), planCounter(0), actionsLog(), plans(), settlements(), facilitiesOptions() {
     std::ifstream configFile(configFilePath); // Open the configuration file
     if (!configFile.is_open()) {
         throw std::runtime_error("Error: Unable to open config file: " + configFilePath);
@@ -27,14 +24,14 @@ Simulation::Simulation(const string &configFilePath)
 
         if (arguments.empty()) {
             continue; // Skip invalid lines
-        }   
+        }
 
         // Determine the type of entity to create
         if (arguments[0] == "settlement" && arguments.size() == 3) {
             // Create a Settlement
             std::string settlementName = arguments[1];
             int settlementType = std::stoi(arguments[2]); // Convert string to int
-            settlements.emplace_back(settlementName, static_cast<SettlementType>(settlementType)); // Constructed directly in place with enum paassed
+            settlements.emplace_back(new Settlement(settlementName, static_cast<SettlementType>(settlementType))); // Corrected
         }
         else if (arguments[0] == "facility" && arguments.size() == 7) {
             // Create a Facility
@@ -45,29 +42,28 @@ Simulation::Simulation(const string &configFilePath)
             int economyImpact = std::stoi(arguments[5]);
             int environmentImpact = std::stoi(arguments[6]);
 
-            facilitiesOptions.emplace_back(facilityName, category,price, lifeQualityImpact, economyImpact, environmentImpact);
+            facilitiesOptions.emplace_back(facilityName, static_cast<FacilityCategory>(category), price, lifeQualityImpact, economyImpact, environmentImpact); // Corrected
         }
         else if (arguments[0] == "plan" && arguments.size() == 3) {
             // Create a Plan
             std::string settlementName = arguments[1];
             std::string policyType = arguments[2];
 
-
             SelectionPolicy* policy = nullptr;
-             if (policyType == "nve") {
-                policy = new NaiveSelection();}
-            else if (policyType == "eco") {
+            if (policyType == "nve") {
+                policy = new NaiveSelection();
+            } else if (policyType == "eco") {
                 policy = new EconomySelection();
-            }else if (policyType == "env") {
+            } else if (policyType == "env") {
                 policy = new SustainabilitySelection();
             } else if (policyType == "bal") {
-                policy = new BalancedSelection(0,0,0);
+                policy = new BalancedSelection(0, 0, 0);
             } else {
                 throw std::runtime_error("Error: Unknown selection policy type: " + policyType);
             }
-        
 
-            plans.emplace_back(getSettlement(settlementName), policy);//no error checking here
+            // Corrected: Pass all required arguments to the Plan constructor
+            plans.emplace_back(planCounter, getSettlement(settlementName), policy, facilitiesOptions);
             ++planCounter; // Increment the plan counter
         }
         else {
@@ -152,17 +148,14 @@ void Simulation::start (){
         else{
                 std::cout << "bad command";
             }
-    
     }
       // At the end, delete the last allocated action (if any)
     if (action != nullptr) {
         delete action;}
 }
 
-
-
 void Simulation::addPlan(const Settlement &settlement, SelectionPolicy *selectionPolicy){
-    Plan newplan(planCounter,settlement,selectionPolicy,facilitiesOptions);
+    Plan newplan(planCounter,settlement,selectionPolicy,facilitiesOptions); // Corrected to match constructor
     plans.push_back(newplan);
     ++planCounter;
 }
@@ -203,14 +196,16 @@ bool Simulation::isFacilityexists(const string &facilityname)
     return found;
 }
         
-Settlement& Simulation::getSettlement(const string &settlementName){
-    for(Settlement* set:settlements)
-    {
-        if (set->getName()==settlementName)
-        {return *set;}
+Settlement& Simulation::getSettlement(const string &settlementName) {
+    for (Settlement* set : settlements) {
+        if (set->getName() == settlementName) {
+            return *set; // Return the matching settlement
+        }
     }
-
+    // If no settlement is found, throw an exception
+    throw std::runtime_error("Settlement not found: " + settlementName);
 }
+
 
 bool Simulation::isplanexists(const int planID )
 {

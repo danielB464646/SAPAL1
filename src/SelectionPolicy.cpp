@@ -32,7 +32,7 @@ NaiveSelection* NaiveSelection::clone() const {
     return new NaiveSelection(*this);  // Return a new instance with the same state
 }
 
-NaiveSelection::~NaiveSelection(){}//has no dynamic memory to release
+// NaiveSelection::~NaiveSelection(){}//has no dynamic memory to release
 
 //-------------BALANCEDSELECTION----------------------------------------------------------------------------
 
@@ -83,7 +83,7 @@ BalancedSelection* BalancedSelection::clone() const {
     return new BalancedSelection(*this);  // Return a new instance with the same state // default copy contructor 
 }
 
-BalancedSelection::~BalancedSelection(){}//no dynamic memory to release
+// BalancedSelection::~BalancedSelection(){}//no dynamic memory to release
 
 //------------ECONOMYSELECTION-----------------------------------------------------------
 EconomySelection::EconomySelection(){
@@ -153,7 +153,7 @@ EconomySelection* EconomySelection::clone() const {
     return new EconomySelection(*this);  // Return a new instance with the same state // default copy contructor 
 }
 
-EconomySelection::~EconomySelection(){} //no memory to release
+// EconomySelection::~EconomySelection(){} //no memory to release
 
 
 //------------------------SUSTAINABILITYSELECTION---------------------
@@ -204,6 +204,6 @@ SustainabilitySelection* SustainabilitySelection::clone() const {
     return new SustainabilitySelection(*this);  // Return a new instance with the same state // default copy contructor 
 }
 
-SustainabilitySelection::~SustainabilitySelection(){} //no memory to release
+// SustainabilitySelection::~SustainabilitySelection(){} //no memory to release
 
 
